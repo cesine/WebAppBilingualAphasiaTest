@@ -64,7 +64,7 @@ http.createServer(function(req, res) {
       safeFilename=safeFilename.replace(/[;:|@&*/\\]/g,"_");
       //safeFilename=safeFilename.replace(/_client\./,".");
       safeFilename=safeFilename.replace(/\.mp3/,".amr");
-      var tempdir = "../temp/";
+      var tempdir = "../results/";
       fs.renameSync(path,tempdir+safeFilename);
       safeFilenameServer = safeFilename.replace(/_client/,"_server");
       
