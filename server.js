@@ -8,9 +8,9 @@ var fs         = require('fs'),
 
 var PUBLIC = path.join(path.dirname(__filename), 'public');
 var devmode = false;
-var port = 8126;
+var port = 8136;
 if (devmode){
-  port = 8124;
+  port = 8134;
 }
 var statuses = {};
 var progresses = {};
@@ -64,7 +64,7 @@ http.createServer(function(req, res) {
       safeFilename=safeFilename.replace(/[;:|@&*/\\]/g,"_");
       //safeFilename=safeFilename.replace(/_client\./,".");
       safeFilename=safeFilename.replace(/\.mp3/,".amr");
-      var tempdir = "../nodejs-pocketsphinxtemp/";
+      var tempdir = "../temp/";
       fs.renameSync(path,tempdir+safeFilename);
       safeFilenameServer = safeFilename.replace(/_client/,"_server");
       
@@ -82,7 +82,7 @@ http.createServer(function(req, res) {
         if (statuses[uuid] === "dictation received" || statuses[uuid] === "transcription nothing fresh" ){
           var runTranscription = function(uuid) { 
             var uuidchange = uuid; //local variable bound by closure
-            exec("sh audio2text.sh "+ safeFilename.replace(/_client\.srt/,""),puts);
+//            exec("sh audio2text.sh "+ safeFilename.replace(/_client\.srt/,""),puts);
             var setFresh = function(){
               statuses[uuidchange]="transcription fresh";
               sys.print("Processed uuid: "+uuidchange+" set to: "+statuses[uuidchange]);
