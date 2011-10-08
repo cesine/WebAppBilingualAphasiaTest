@@ -1,6 +1,6 @@
 #!/bin/bash
 cd ../oprime-server
-mv ../oprime-transcription-heavy src
+mv ../oprime-transcription-lite src
 #mkdir practicetemp
 #cd practicetemp
 
@@ -13,8 +13,8 @@ mkdir logs
 # set up git in the backup folder
 cd backup
 git init
-git config user.name "OPrime Laptop Server Instance"
-git config user.email "oprimeinstance@laptop"
+git config user.name "OPrime Lite Server Instance"
+git config user.email "oprimeinstance@litehost"
 git remote add github git@github.com:iLanguage/oprime-bilingualaphasiatest-opendata.git
 echo "*.3gp\n*.mp3" > .gitignore
 git add .gitignore
