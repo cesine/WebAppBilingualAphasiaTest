@@ -1,7 +1,7 @@
 #!/bin/bash
 # usage bash ../src/srt2touchdata.sh *.srt
 
-cd ../backup
+cd ../trash
 
 #subExperiment = ""
 #participantCode =""
@@ -13,9 +13,15 @@ cd ../backup
 echo "----- Removing old files---- "
 rm en*.csv
 rm fr*.csv
+rm en*.json
+rm fr*.json
 rm particpants.csv
+rm touch-responses.json
 
 echo "----- Extracting data into csv ------"
+jsonfile="touch-responses.json"
+echo '{{"id":0,"x":0,"y":0,"userid":"0000","reactionTime":0,"subexperiment":"00","stimulus":0,"color":"#000000","r":3}' >> $jsonfile
+
 for i in $@
 do
   file=$i
@@ -45,21 +51,29 @@ do
   reactiontimes=${REACTIONS//ReactionTimes [/$participantcode,$starttime,reaction,};
   reactiontimes=${reactiontimes// /};
   echo ${reactiontimes/]/} >> $csvfile
-  
+  reactionarr=${REACTIONS//ReactionTimes [/}; 
+  reactionarr=${reactionarr//]/};
+  #echo  $reactionarr
+
   TOUCHES=`cat temptouches`
   touchesdata=${TOUCHES//TouchResponses [/};
   touchesdata=${touchesdata//]/};
 
-  IFS=$','
+  IFS=$', '
+  arrreac=($reactionarr)
+  counter=0;
   set $touchesdata
   ys=""
   xs=""
   for t in $touchesdata
   do
+    echo "  ,{\"id\":0,\"x\":${t%%:::*},\"y\":${t#*:::},\"userid\":\"$participantcode\",\"reactionTime\":${arrreac[$counter]},\"subexperiment\":\"$subexperimentcode\",\"stimulus\":$counter,\"color\":\"#00ff00\",\"r\":10}" >> $jsonfile
+    counter=`expr $counter + 1`;
     xs=$xs,${t%%:::*}
     ys=$ys,${t#*:::}
   done
   unset IFS
+  
   echo $participantcode,$starttime,x${xs// /} >>$csvfile
   echo $participantcode,$starttime,y$ys >> $csvfile
 
@@ -68,6 +82,7 @@ do
   rm temptouches
 done
 
+echo "}" >> $jsonfile
 
 
 echo "==============================================================="
