@@ -1,7 +1,7 @@
 #!/bin/bash
 # usage bash ../src/srt2touchdata.sh *.srt
 
-cd ../trash
+cd ../backup
 
 #subExperiment = ""
 #participantCode =""
@@ -20,7 +20,7 @@ rm touch-responses.json
 
 echo "----- Extracting data into csv ------"
 jsonfile="touch-responses.json"
-echo '{{"id":0,"x":0,"y":0,"userid":"0000","reactionTime":0,"subexperiment":"00","stimulus":0,"color":"#000000","r":3}' >> $jsonfile
+echo '{"responses":[{"id":0,"x":0,"y":0,"userid":"0000","reactionTime":0,"subexperiment":"00","stimulus":0,"color":"#000000","r":3}' >> $jsonfile
 
 for i in $@
 do
@@ -82,7 +82,7 @@ do
   rm temptouches
 done
 
-echo "}" >> $jsonfile
+echo "]}" >> $jsonfile
 
 
 echo "==============================================================="
