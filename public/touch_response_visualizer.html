@@ -1,0 +1,570 @@
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<!-- Including the Lobster font from Google's Font Directory -->
+
+<STYLE type="text/css">
+@font-face {
+  font-family: 'Lobster';
+  font-style: normal;
+  font-weight: normal;
+  src: local('Lobster'), url('google_lobster_font.woff') format('woff');
+}
+@font-face {
+  font-family: 'Lobster';
+  font-style: normal;
+  font-weight: normal;
+  src: local('Lobster'), url('http://themes.googleusercontent.com/static/fonts/lobster/v3/NIaFDq6p6eLpSvtV2DTNDQLUuEpTyoUstqEm5AMlJo4.woff') format('woff');
+}
+input.groovybutton
+{
+	 font-size:10px;
+   color:#FFFFFF;
+   background-color:#006633;
+   border-style:double;
+}
+</STYLE>
+
+
+<link href='http://fonts.googleapis.com/css?family=Merienda+One' rel='stylesheet' type='text/css'>
+<link rel="stylesheet" type="text/css" href="imagegallery/MooFlow.css" />
+<link rel="stylesheet" type="text/css" href="imagegallery/styles.css" />
+<script type="text/javascript" src="imagegallery/mootools-1.2-core.js"></script>
+<script type="text/javascript" src="imagegallery/mootools-1.2-more.js"></script>
+<script type="text/javascript" src="imagegallery/MooFlow.js"></script>
+
+<script>
+
+	
+	var myMooFlowPage = {	
+		start: function(){
+			/* MooFlow instance with the complete UI and dbllick-callback */
+			mf = new MooFlow($('MooFlowieze'), {
+				useSlider: true,
+				useAutoPlay: false,
+				useCaption: true,
+				bgColor: '#fff',
+				useResize: true,
+				useMouseWheel: true,
+				useKeyInput: true,
+				useViewer: true,
+				'onClickView': function(mixedObject){
+					myMooFlowPage.log(JSON.encode(mixedObject));
+					//console.log(mixedObject);
+					if(mixedObject.stimulus >=0){
+						currentSubExperiment.stimuli[mixedObject.stimulus].draw();
+					}else{
+						console.log("no stimulus number");
+					}
+				},
+				'onStart': function(){
+					myMooFlowPage.log("MooFlow initialized");
+				},
+				'onChancel': function(error){
+					myMooFlowPage.log(error);
+				},
+				'onAutoPlay': function(){
+					myMooFlowPage.log("AutoPlay started");
+				},
+				'onAutoStop': function(){
+					myMooFlowPage.log("AutoPlay stoped");
+				},
+				'onResized': function(isFull){
+					myMooFlowPage.log("onResized Fullscreen: " + isFull);
+				}
+			});
+			$$('.loadexternalsubexperiment').addEvent('click', function(){
+				//mf.loadJSON(this.get('href'));
+				currentSubExperiment = new SubExperiment();
+				currentSubExperiment.loadJSON(this.get('href'));
+				return false;
+			});
+			$$('.loadjson').addEvent('click', function(){
+				mf.loadJSON(this.get('href'));
+				return false;
+			});
+			$$('.loadremote').addEvent('click', function(){
+				mf.loadHTML(this.get('href'), this.get('rel'));
+				return false;
+			});
+		},
+		log: function(result){
+			new Element('p',{html:result}).inject($('callback'), 'top');
+		}
+	};
+	
+
+
+	var addResponses;
+	var addStimuli;
+	var addSubExperiments;
+	var setCurrentSubExperiment;
+  var subExperiments = [];
+	var stimuliimages = [];
+	var currentSubExperiment = [];
+	var tempdata = [];
+	tempdata.images = [];
+	var titleFont;
+	var titleLabel;
+	var labelFont;
+	var viewstimulus;
+	var ctx;
+
+	var pause = false;
+	var timer;
+	var stopLooping = function() {
+		clearInterval(timer);
+	}
+	var buttonRadiusForClicking = 10;
+	var pushButton = function(id) {
+		//to be defined later
+	}
+	var getPositionAsButton = function(x, y) {
+		//to be defined later
+	}
+	var mf;
+	var participantCodes;
+	var setReplayParticipantCode;
+	var subExperimentLabels = [];
+	var xImage = new Image();
+	xImage.src = "images/x.jpg";
+	var auditoryLabels = [];
+	var auditorySrc = [];
+	var menuShape = "arc"; //arc or circle
+
+	var randomColor = function() {
+		//return 'hs1('+Math.floor(Math.random() * 360) + ',100%,50%)';
+		//return '#'+Math.floor(Math.random() * 360);
+		return '#000000'.replace(/0/g, function() {
+			return (~~(Math.random() * 16)).toString(16);
+		})
+		//return '#'+Math.floor(Math.random()*16777215).toString(16);
+	}
+	var randomBlueGreenColor = function() {
+		return 'hs1(' + Math.floor(Math.random() * 100 + 100) + ',100%,50%)';
+	}
+	var srandom = function() {
+		return Math.random() * 2 - 1;
+	}
+	Response = function() {
+		this.id = 0;
+		this.x = 0;
+		this.y = 0;
+		this.userid = 0;
+		this.reactionTime = 0;
+		this.label = "";
+		this.stimuli = "";
+		this.init = function(i) {
+			this.id = i;
+			this.color = randomColor();
+			this.x = Math.random() * ctx.canvas.width;
+			this.y = Math.random() * ctx.canvas.height;
+			var maxButtonSize = Math.max(buttonRadiusForClicking - 10, 3);
+			this.r = 10;//Math.random() * (8) + maxButtonSize;
+		}
+		this.draw = function() {
+			ctx.fillStyle = this.color;
+			ctx.beginPath();
+			ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2, false);
+			ctx.closePath();
+			ctx.fill();
+		}
+	}
+	Stimulus = function() {
+		this.id = 0;
+		this.label = "";
+		this.imagex = "";
+		this.image = new Image();
+		this.imageScaleFactor = 1;
+		this.offset = 0;
+		this.title =  "Filler";
+		this.windowxsize = 0;
+		this.windowysize = 0;
+		this.responses = [];
+		this.init = function(i) {
+			this.id = i;
+			this.image.title = "Filler";
+			this.image.src = "images/androids_experimenter_kids.png";
+		}
+		this.draw = function(){
+			imageScaleFactor = canvasHeight/this.image.height;
+			if(this.image.width*imageScaleFactor > canvasWidth){
+				imageScaleFactor=canvasWidth/this.image.width;
+			}
+			imageScaleFactor = canvasWidth/2/this.image.width;
+			this.offset = 10;//(canvasWidth-xImage.width*imageScaleFactor-subExperiments[7].stimuli[3].image.width*imageScaleFactor )/2;
+			window.ctx.drawImage(xImage, this.offset, 0, xImage.width, xImage.height);
+			window.ctx.drawImage(this.image, canvasWidth/2, 0, this.image.width*imageScaleFactor, this.image.height*imageScaleFactor);	
+			for ( var r = 0; r < this.responses.length; r++){
+				this.responses[r].draw();
+			}
+		}
+	}
+	SubExperiment = function() {
+		this.id = 0;
+		this.label = "";
+		this.stimuli = [];
+		this.init = function(i) {
+			this.id = i;
+		}
+		this.draw = function(){
+			
+		}
+		this.setAsImageGallery = function(){
+			tempdata = [];
+			tempdata.images = [];
+			for (var t = 0; t < this.stimuli.length; t++){
+				tempdata.images[t] = {"src": this.stimuli[t].image.src, "title": this.stimuli[t].image.title, "stimulus":t};
+			}
+			mf.master = tempdata;
+      mf.clearMain();
+      mf.fireEvent('request', tempdata);
+		}
+		this.loadJSON = function(url){
+		if(!url || this.isLoading) return;
+		this.isLoading = true;
+		new Request.JSON({
+			'onComplete': function(data){
+				if($chk(data)){
+					//console.log(data);
+					//mf =null;
+					//myMooFlowPage.start();
+					this.label = data.label;
+					for(var t = 0; t < data.stimuli.length; t++){
+						var h = new Stimulus();
+						h.init(t);
+						h.label = data.stimuli[t].label;
+						//h.image = new Image();
+						//h.image.src = data.stimuli[0].image.src;
+						tempdata.images[t] = {"src": data.stimuli[t].image.src, "title": data.stimuli[t].image.title, "stimulus":t};
+						tempimg = new Image();
+						tempimg.src = data.stimuli[t].image.src;
+						tempimg.title = data.stimuli[t].image.title;
+						h.image = tempimg;
+						//tempdata.images.push(tempimg);
+						console.log("tempdata"+tempdata);
+						for (var s = 0; s < data.stimuli[t].responses.length; s++){
+							var r = new Response();
+							r.init(s);
+							r.label = data.stimuli[t].responses[s].label;
+							r.x = data.stimuli[t].responses[s].x;
+							r.y = data.stimuli[t].responses[s].y;
+							h.responses.push(r);
+						}
+						this.stimuli.push(h);
+					}		
+					console.log(tempdata);
+					mf.master = tempdata;
+					mf.clearMain();
+					mf.fireEvent('request', tempdata);
+				}
+			}.bind(this)
+		 }, this).get(url);
+		}
+	}
+
+	function addResponses(n, stimulus) {
+		stimulus.responses =[];
+		for ( var i = 0; i < n; i++) {
+			var e = new Response();
+			e.init(i);
+			stimulus.responses.push(e);
+		}
+	}
+	function addStimuli(subexperiment,imagesrcs,imagetitles) {
+		subexperiment.stimuli = [];
+		for ( var i = 0; i < imagesrcs.length; i++) {
+			var e = new Stimulus();
+			e.init(i);
+			e.label = imagetitles[i];
+			e.image = null;
+			e.image = new Image();
+			e.image.title = imagetitles[i];
+			e.image.src = "images/"+imagesrcs[i];
+			//addResponses(2,e);
+			subexperiment.stimuli.push(e);
+		}
+	}
+	function setCurrentSubExperiment(id){
+		console.log("in set sub experiment" + id);
+		currentSubExperiment = new SubExperiment();
+		currentSubExperiment = subExperiments[id];
+		currentSubExperiment.setAsImageGallery();
+	}
+	function addSubExperiments(n) {
+		subExperiments = [];
+		for ( var i = 0; i < n; i++) {
+			var e = new SubExperiment();
+			e.init(i);
+			e.label = window.subExperimentLabels[i];
+			addStimuli(e,stimuliimages[i].imagesrcs,stimuliimages[i].imagetitles);	
+			subExperiments.push(e);
+		}
+	}
+	function clearBubbles(bubbleType) {
+		var n = bubbleType.length;
+		for ( var i = 0; i < n; i++) {
+			bubbleType.pop();
+		}
+	}
+
+	function isNativeAndroidApp() {
+		return /BilingualAphasiaTest\/[0-9\.]+$/.test(navigator.userAgent);
+	}
+	if (isNativeAndroidApp()) {
+		window.pressButton = function(id, label) {
+			if (label === "Start" || label === "Commencer") {
+				Android.setAutoAdvanceJS("1");
+			}
+			Android.launchSubExperimentJS(id);
+		}
+		fetchSubExperimentsArray = function() {
+			result = Android.fetchSubExperimentsArrayJS();
+			result = result.replace(/\]/g, "").replace(/\[/g, "");
+			subExperimentLabels = result.split(", ");//"History of Bilingualism","English Background","Spontaneous Speech","Verbal Comprehension","Pointing","Simple and Semi-complex Commands","Complex Commands","Verbal Auditory Discrimination","Syntactic Comprehension","Semantic Categories","Synonyms","Antonyms","Grammaticality Judgement","Semantic Acceptability","Lexical Decision","Series","Verbal Fluency","Naming","Sentence Construction","Semantic Opposites","Derivational Morphology","Morphological Opposites","Description","Mental Arithmetic","Listening Comprehension","Reading","Copying","Dictation","Reading Comprehension for Words","Reading Comprehension for Sentences","Writing");
+			console.log(subExperimentLabels);
+			fetchStimuliImages();
+			//Android.showToast(subExperimentLabels);
+		}
+		fetchStimuliImages = function(){
+			stimuliimages = null; //[];
+			for (var i = 0; i < subExperimentLabels.length; i++){
+				stimuliimages[i] = [];
+				stimuliimages[i].imagesrcs = "androids_experimenter_kids.png".split(",");
+				stimuliimages[i].imagetitles = "Filler".split(",");
+			}
+			stimuliimages[7].imagesrcs = "e048_0.jpg,e048_e408.jpg,e049_e409.jpg,ef050.jpg,e051.jpg,e052_e410.jpg,e053_e411.jpg,e054_e412.jpg,e055.jpg,e056.jpg,ef057.jpg,e058_e413.jpg,e059_e414.jpg,e060_e415.jpg,ef061.jpg,e062_e416.jpg,e063.jpg,e064_e417.jpg,e065.jpg".split(",");
+			stimuliimages[22].imagesrcs = "e344_f0344.jpg".split(",");
+      stimuliimages[25].imagesrcs = "e367.jpg,e372.jpg,androids_experimenter_kids.png,e377.jpg,e379.jpg,e381.jpg,e383.jpg,e385.jpg,androids_experimenter_kids1.png,e387_0.jpg,androids_experimenter_kids1.png".split(",");
+      stimuliimages[26].imagesrcs = "e393.jpg".split(",");
+      stimuliimages[28].imagesrcs = "e408_0.jpg,e048_e408.jpg,e409_0.jpg,e049_e409.jpg,e410_0.jpg,e052_e410.jpg,e411_0.jpg,e053_e411.jpg,e412_0.jpg,e054_e412.jpg,e413_0.jpg,e058_e413.jpg,e414_0.jpg,e059_e414.jpg,e415_0.jpg,e060_e415.jpg,e416_0.jpg,e062_e416.jpg,e417_0.jpg,e064_e417.jpg".split(",");
+
+      stimuliimages[29].imagesrcs = "e418_0.jpg,e066_and_f066_to_f070_ef418.jpg,e419_0.jpg,e071_e419.jpg,e420_0.jpg,ef420.jpg,e421_0.jpg,ef421.jpg,e422_0.jpg,ef422.jpg,e423_0.jpg,ef423.jpg,e424_0.jpg,ef424.jpg,e425_0.jpg,e077_and_f077_to_f080_ef425.jpg,e426_0.jpg,e081_and_f081_to_f088_ef426_f0419.jpg,e427_0.jpg,e427_ef0133_to_ef0136.jpg".split(",");
+
+      stimuliimages[7].imagetitles = "e048_0.jpg,e048_e408.jpg,e049_e409.jpg,ef050.jpg,e051.jpg,e052_e410.jpg,e053_e411.jpg,e054_e412.jpg,e055.jpg,e056.jpg,ef057.jpg,e058_e413.jpg,e059_e414.jpg,e060_e415.jpg,ef061.jpg,e062_e416.jpg,e063.jpg,e064_e417.jpg,e065.jpg".split(",");
+			stimuliimages[28].imagetitles = "e408_0.jpg,e048_e408.jpg,e409_0.jpg,e049_e409.jpg,e410_0.jpg,e052_e410.jpg,e411_0.jpg,e053_e411.jpg,e412_0.jpg,e054_e412.jpg,e413_0.jpg,e058_e413.jpg,e414_0.jpg,e059_e414.jpg,e415_0.jpg,e060_e415.jpg,e416_0.jpg,e062_e416.jpg,e417_0.jpg,e064_e417.jpg".split(",");
+      stimuliimages[29].imagetitles = "e418_0.jpg,e066_and_f066_to_f070_ef418.jpg,e419_0.jpg,e071_e419.jpg,e420_0.jpg,ef420.jpg,e421_0.jpg,ef421.jpg,e422_0.jpg,ef422.jpg,e423_0.jpg,ef423.jpg,e424_0.jpg,ef424.jpg,e425_0.jpg,e077_and_f077_to_f080_ef425.jpg,e426_0.jpg,e081_and_f081_to_f088_ef426_f0419.jpg,e427_0.jpg,e427_ef0133_to_ef0136.jpg".split(",");
+
+
+
+
+		}
+		fetchExperimentTitle = function() {
+			titleLabel = Android.fetchExperimentTitleJS();
+		}
+		fetchParticipantCodes = function() {
+			result = Android.fetchParticipantCodesJS();
+			result = result.replace(/\]/g, "").replace(/\[/g, "");
+			if (result.length > 0) {
+				participantCodes = result.split(", ");//"ET1AM4mc, SAMPLE".split(",");
+			} else {
+				participantCodes = "";
+			}
+		}
+		setReplayParticipantCode = function(code) {
+			Android.setReplayParticipantCodeJS(code);
+		}
+	} else {
+		//alert("in a browser");
+		window.pressButton = function(id, label) {
+			if (label === "Start" || label === "Commencer") {
+				alert("Starting AutoAdvance - pressed experiment button " + id);
+			} else {
+				alert("pressed experiment button " + id);
+			}
+		}
+		fetchSubExperimentsArray = function() {
+			var javaArrayListToString = "[History of Bilingualism, English Background, Spontaneous Speech, Verbal Comprehension, Pointing, Simple and Semi-complex Commands, Complex Commands, Verbal Auditory Discrimination, Syntactic Comprehension, Semantic Categories, Synonyms, Antonyms, Grammaticality Judgement, Semantic Acceptability, Lexical Decision, Series, Verbal Fluency, Naming, Sentence Construction, Semantic Opposites, Derivational Morphology, Morphological Opposites, Description, Mental Arithmetic, Listening Comprehension, Reading, Copying, Dictation, Reading Comprehension for Words, Reading Comprehension for Sentences, Writing]";
+			javaArrayListToString = javaArrayListToString.replace(/\]/g, "")
+					.replace(/\[/g, "");
+			subExperimentLabels = javaArrayListToString.split(", ");
+			auditoryLabels = "rain,mat,ball".split(",");
+			auditorySrc = "e048_0.jpg,e048_e408.jpg,e049_e409.jpg,ef050.jpg,e051.jpg,e052_e410.jpg,e053_e411.jpg,e054_e412.jpg,e055.jpg,e056.jpg,ef057.jpg,e058_e413.jpg,e059_e414.jpg,e060_e415.jpg,ef061.jpg,e062_e416.jpg,e063.jpg,e064_e417.jpg,e065.jpg".split(",");
+			console.log(subExperimentLabels);
+			fetchStimuliImages();
+			addSubExperiments(subExperimentLabels.length);
+			for ( var p = 0; p < subExperimentLabels.length; p++) {
+        var playButtn = document.createElement("input");
+        playButtn.setAttribute("type", "button");
+        playButtn.setAttribute("id", subExperimentLabels[p]);
+        playButtn.setAttribute("value", p+" "+subExperimentLabels[p]);
+        playButtn.setAttribute("name", subExperimentLabels[p]);
+        playButtn.setAttribute("class", "groovybutton");
+        playButtn.setAttribute("onClick", "setCurrentSubExperiment('"
+            + p + "')");
+        document.getElementById("buttonArea").appendChild(playButtn);
+
+        document.getElementById("buttonArea").appendChild(
+            document.createElement('br'));
+      }
+
+		}
+		fetchStimuliImages = function(){
+      stimuliimages = [];
+      for (var i = 0; i < subExperimentLabels.length; i++){
+        stimuliimages[i] = [];
+        stimuliimages[i].imagesrcs = "androids_experimenter_kids.png".split(",");
+        stimuliimages[i].imagetitles = "Filler".split(",");
+      }
+			stimuliimages[7].imagesrcs = "e048_0.jpg,e048_e408.jpg,e049_e409.jpg,ef050.jpg,e051.jpg,e052_e410.jpg,e053_e411.jpg,e054_e412.jpg,e055.jpg,e056.jpg,ef057.jpg,e058_e413.jpg,e059_e414.jpg,e060_e415.jpg,ef061.jpg,e062_e416.jpg,e063.jpg,e064_e417.jpg,e065.jpg".split(",");
+			stimuliimages[8].imagesrcs = "ef066_0.jpg,e066_and_f066_to_f070_ef418.jpg,e066_and_f066_to_f070_ef418.jpg,e066_and_f066_to_f070_ef418.jpg,e066_and_f066_to_f070_ef418.jpg,e066_and_f066_to_f070_ef418.jpg,e071_e419.jpg,e071_e419.jpg,e071_e419.jpg,e071_e419.jpg,e071_e419.jpg,e071_e419.jpg,e077_and_f077_to_f080_ef425.jpg,e077_and_f077_to_f080_ef425.jpg,e077_and_f077_to_f080_ef425.jpg,e077_and_f077_to_f080_ef425.jpg,e081_and_f081_to_f088_ef426_f0419.jpg,e081_and_f081_to_f088_ef426_f0419.jpg,e081_and_f081_to_f088_ef426_f0419.jpg,e081_and_f081_to_f088_ef426_f0419.jpg,e081_and_f081_to_f088_ef426_f0419.jpg,e081_and_f081_to_f088_ef426_f0419.jpg,e081_and_f081_to_f088_ef426_f0419.jpg,e081_and_f081_to_f088_ef426_f0419.jpg,e089_f089_a_f096.jpg,e089_f089_a_f096.jpg,e089_f089_a_f096.jpg,e089_f089_a_f096.jpg,e089_f089_a_f096.jpg,e089_f089_a_f096.jpg,e089_f089_a_f096.jpg,e089_f089_a_f096.jpg,e097_and_f071_to_f076.jpg,e097_and_f071_to_f076.jpg,e097_and_f071_to_f076.jpg,e097_and_f071_to_f076.jpg,e097_and_f071_to_f076.jpg,e097_and_f071_to_f076.jpg,e097_and_f071_to_f076.jpg,e097_and_f071_to_f076.jpg,e105.jpg,e105.jpg,e105.jpg,e105.jpg,e105.jpg,e105.jpg,e111_f0111_to_f0114.jpg,e111_f0111_to_f0114.jpg,e111_f0111_to_f0114.jpg,e111_f0111_to_f0114.jpg,e115_f0115_to_f0120.jpg,e115_f0115_to_f0120.jpg,e115_f0115_to_f0120.jpg,e115_f0115_to_f0120.jpg,e115_f0115_to_f0120.jpg,e121_f0121_a_f0124.jpg,e121_f0121_a_f0124.jpg,e121_f0121_a_f0124.jpg,e121_f0121_a_f0124.jpg,e125_f0125_to_f0128.jpg,e125_f0125_to_f0128.jpg,e125_f0125_to_f0128.jpg,e125_f0125_to_f0128.jpg,e129_f0129_a_f0132.jpg,e129_f0129_a_f0132.jpg,e129_f0129_a_f0132.jpg,e129_f0129_a_f0132.jpg,e427_ef0133_to_ef0136.jpg,e427_ef0133_to_ef0136.jpg,e427_ef0133_to_ef0136.jpg,e427_ef0133_to_ef0136.jpg,e137_e145.jpg,e138_e146.jpg,e139_e147.jpg,e140_e148_f0137_et_f0145.jpg,e141_e149.jpg,e142_e150.jpg,e143_e151.jpg,e144_e152_f0141_et_f0149.jpg,e137_e145.jpg,e138_e146.jpg,e139_e147.jpg,e140_e148_f0137_et_f0145.jpg,e141_e149.jpg,e142_e150.jpg,e143_e151.jpg,e144_e152_f0141_et_f0149.jpg".split(",");
+			stimuliimages[22].imagesrcs = "e344_f0344.jpg".split(",");
+			stimuliimages[25].imagesrcs = "e367.jpg,e372.jpg,androids_experimenter_kids.png,e377.jpg,e379.jpg,e381.jpg,e383.jpg,e385.jpg,androids_experimenter_kids1.png,e387_0.jpg,androids_experimenter_kids2.png".split(",");
+			stimuliimages[26].imagesrcs = "e393.jpg".split(",");
+			stimuliimages[28].imagesrcs = "e408_0.jpg,e048_e408.jpg,e409_0.jpg,e049_e409.jpg,e410_0.jpg,e052_e410.jpg,e411_0.jpg,e053_e411.jpg,e412_0.jpg,e054_e412.jpg,e413_0.jpg,e058_e413.jpg,e414_0.jpg,e059_e414.jpg,e415_0.jpg,e060_e415.jpg,e416_0.jpg,e062_e416.jpg,e417_0.jpg,e064_e417.jpg".split(",");
+
+			stimuliimages[29].imagesrcs = "e418_0.jpg,e066_and_f066_to_f070_ef418.jpg,e419_0.jpg,e071_e419.jpg,e420_0.jpg,ef420.jpg,e421_0.jpg,ef421.jpg,e422_0.jpg,ef422.jpg,e423_0.jpg,ef423.jpg,e424_0.jpg,ef424.jpg,e425_0.jpg,e077_and_f077_to_f080_ef425.jpg,e426_0.jpg,e081_and_f081_to_f088_ef426_f0419.jpg,e427_0.jpg,e427_ef0133_to_ef0136.jpg".split(",");
+
+			stimuliimages[7].imagetitles = "e048_0.jpg,e048_e408.jpg,e049_e409.jpg,ef050.jpg,e051.jpg,e052_e410.jpg,e053_e411.jpg,e054_e412.jpg,e055.jpg,e056.jpg,ef057.jpg,e058_e413.jpg,e059_e414.jpg,e060_e415.jpg,ef061.jpg,e062_e416.jpg,e063.jpg,e064_e417.jpg,e065.jpg".split(",");
+      stimuliimages[8].imagetitles = "ef066_0.jpg,e066_and_f066_to_f070_ef418.jpg,e066_and_f066_to_f070_ef418.jpg,e066_and_f066_to_f070_ef418.jpg,e066_and_f066_to_f070_ef418.jpg,e066_and_f066_to_f070_ef418.jpg,e071_e419.jpg,e071_e419.jpg,e071_e419.jpg,e071_e419.jpg,e071_e419.jpg,e071_e419.jpg,e077_and_f077_to_f080_ef425.jpg,e077_and_f077_to_f080_ef425.jpg,e077_and_f077_to_f080_ef425.jpg,e077_and_f077_to_f080_ef425.jpg,e081_and_f081_to_f088_ef426_f0419.jpg,e081_and_f081_to_f088_ef426_f0419.jpg,e081_and_f081_to_f088_ef426_f0419.jpg,e081_and_f081_to_f088_ef426_f0419.jpg,e081_and_f081_to_f088_ef426_f0419.jpg,e081_and_f081_to_f088_ef426_f0419.jpg,e081_and_f081_to_f088_ef426_f0419.jpg,e081_and_f081_to_f088_ef426_f0419.jpg,e089_f089_a_f096.jpg,e089_f089_a_f096.jpg,e089_f089_a_f096.jpg,e089_f089_a_f096.jpg,e089_f089_a_f096.jpg,e089_f089_a_f096.jpg,e089_f089_a_f096.jpg,e089_f089_a_f096.jpg,e097_and_f071_to_f076.jpg,e097_and_f071_to_f076.jpg,e097_and_f071_to_f076.jpg,e097_and_f071_to_f076.jpg,e097_and_f071_to_f076.jpg,e097_and_f071_to_f076.jpg,e097_and_f071_to_f076.jpg,e097_and_f071_to_f076.jpg,e105.jpg,e105.jpg,e105.jpg,e105.jpg,e105.jpg,e105.jpg,e111_f0111_to_f0114.jpg,e111_f0111_to_f0114.jpg,e111_f0111_to_f0114.jpg,e111_f0111_to_f0114.jpg,e115_f0115_to_f0120.jpg,e115_f0115_to_f0120.jpg,e115_f0115_to_f0120.jpg,e115_f0115_to_f0120.jpg,e115_f0115_to_f0120.jpg,e121_f0121_a_f0124.jpg,e121_f0121_a_f0124.jpg,e121_f0121_a_f0124.jpg,e121_f0121_a_f0124.jpg,e125_f0125_to_f0128.jpg,e125_f0125_to_f0128.jpg,e125_f0125_to_f0128.jpg,e125_f0125_to_f0128.jpg,e129_f0129_a_f0132.jpg,e129_f0129_a_f0132.jpg,e129_f0129_a_f0132.jpg,e129_f0129_a_f0132.jpg,e427_ef0133_to_ef0136.jpg,e427_ef0133_to_ef0136.jpg,e427_ef0133_to_ef0136.jpg,e427_ef0133_to_ef0136.jpg,e137_e145.jpg,e138_e146.jpg,e139_e147.jpg,e140_e148_f0137_et_f0145.jpg,e141_e149.jpg,e142_e150.jpg,e143_e151.jpg,e144_e152_f0141_et_f0149.jpg,e137_e145.jpg,e138_e146.jpg,e139_e147.jpg,e140_e148_f0137_et_f0145.jpg,e141_e149.jpg,e142_e150.jpg,e143_e151.jpg,e144_e152_f0141_et_f0149.jpg".split(",");
+      stimuliimages[22].imagetitles = "e344_f0344.jpg".split(",");
+      stimuliimages[25].imagetitles = "e367.jpg,e372.jpg,androids_experimenter_kids.png,e377.jpg,e379.jpg,e381.jpg,e383.jpg,e385.jpg,androids_experimenter_kids1.png,e387_0.jpg,androids_experimenter_kids2.png".split(",");
+      stimuliimages[26].imagetitles = "e393.jpg".split(",");
+      stimuliimages[28].imagetitles = "e408_0.jpg,e048_e408.jpg,e409_0.jpg,e049_e409.jpg,e410_0.jpg,e052_e410.jpg,e411_0.jpg,e053_e411.jpg,e412_0.jpg,e054_e412.jpg,e413_0.jpg,e058_e413.jpg,e414_0.jpg,e059_e414.jpg,e415_0.jpg,e060_e415.jpg,e416_0.jpg,e062_e416.jpg,e417_0.jpg,e064_e417.jpg".split(",");
+      stimuliimages[29].imagetitles = "e418_0.jpg,e066_and_f066_to_f070_ef418.jpg,e419_0.jpg,e071_e419.jpg,e420_0.jpg,ef420.jpg,e421_0.jpg,ef421.jpg,e422_0.jpg,ef422.jpg,e423_0.jpg,ef423.jpg,e424_0.jpg,ef424.jpg,e425_0.jpg,e077_and_f077_to_f080_ef425.jpg,e426_0.jpg,e081_and_f081_to_f088_ef426_f0419.jpg,e427_0.jpg,e427_ef0133_to_ef0136.jpg".split(",");
+
+
+
+    }
+		fetchExperimentTitle = function() {
+			titleLabel = "Bilingual Aphasia Test - English";
+		}
+		fetchParticipantCodes = function() {
+			participantCodes = 'ET1AM4mc, SAMPLE'.split(",");
+		}
+		setReplayParticipantCode = function(code) {
+			console.log("IN set replay button");
+			alert("Set replay participant to " + code);
+		}
+	}
+
+	loadButton = function() {
+		fetchSubExperimentsArray();
+		fetchExperimentTitle();
+		//addSubExperiments(subExperimentLabels.length);
+		console.log(subExperiments);
+		getPositionAsButton = function(x, y, buttonid, responses) {
+			/*
+			If recieved a button id, flash that button
+			and press it 500ms later
+			 */
+			if (buttonid != null) {
+				for ( var k = 0; k < responses.length; k++) {
+					if (responses[k].id === buttonid) {
+						responses[k].color = "#999999";
+						responses[k].r = buttonRadiusForClicking;
+						responses[k].draw()
+						ctx.textAlign = responses[k].textAlign;
+						ctx.fillText(responses[k].label, responses[k].labelx,
+								responses[k].labely);
+						//alert("Clicked "+responses[k].id);
+						setTimeout("window.pressButton(responses[" + k
+								+ "].id,responses[" + k + "].label);", 500);
+						return;//dont click on multiple buttons
+					} else {
+						//alert(" distance to this position "+d);
+						//alert("Position filled is at "+responses[k].x+" "+responses[k].y);
+					}
+				}
+			}
+			/*
+			Otherwise check to see if the x,y match a button
+			 */
+
+			for ( var k = 0; k < responses.length; k++) {
+				var dx = x - responses[k].x;
+				var dy = y - responses[k].y;
+				var d = Math.sqrt(dx * dx + dy * dy);
+				var R = buttonRadiusForClicking;// responses[k].r + 5;//added 10 pixles to click around the buton
+				if (d < R) {
+					responses[k].color = "#aaaaaa";
+					responses[k].r = buttonRadiusForClicking;
+					responses[k].draw();
+					ctx.textAlign = responses[k].textAlign;
+					ctx.fillText(responses[k].label, responses[k].labelx,
+							responses[k].labely);
+					//alert("Clicked "+responses[k].id);
+					setTimeout("window.pressButton(responses[" + k
+							+ "].id,responses[" + k + "].label);", 0);
+					return;//dont click on multiple buttons
+				} else {
+					//alert(" distance to this position "+d);
+					//alert("Position filled is at "+responses[k].x+" "+responses[k].y);
+				}
+			}
+		}
+		ctx.canvas.addEventListener('touchstart', function(e) {
+			//alert(e.changedresponses[0].pageX + " " + e.changedresponses[0].pageY);
+			getPositionAsButton(e.pageX, e.pageY);
+		});
+		ctx.canvas.addEventListener('mousedown', function(e) {
+			console.log(e);
+			//alert(e.pageX + " " + e.pageY);
+			getPositionAsButton(e.pageX, e.pageY);
+		});
+
+	}
+	initCanvas = function() {
+		canvasWidth = 1280;
+		canvasHeight = 800;
+		viewstimulus = document.getElementById("viewStimulus");
+		viewstimulus.setAttribute("width", canvasWidth);
+		viewstimulus.setAttribute("height", canvasHeight);
+		//viewstimulus.setAtt.ibute('style', 'background-color: #999;');
+		viewstimulus.style.position = "relative";
+		viewstimulus.style.zindex = 1;
+		window.ctx = viewstimulus.getContext("2d");
+		
+		ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+		//loadButton();
+	}
+	loadData = function() {
+		initCanvas();
+		fetchSubExperimentsArray();
+		fetchExperimentTitle();
+		//addSubExperiments(subExperimentLabels.length);
+		loadButton();
+}
+
+	window.addEvent('domready', myMooFlowPage.start);
+
+</script>
+
+</head>
+<body leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+
+<div id="content">
+	<div class="colC left">
+	<div id=MooFlowieze>
+	</div>
+	</div>
+	<div class="colAA right">
+	<p>Doubleclick on a image.</p>
+	<div id="callback"></div>
+	</div>
+</div>
+
+<table cellpadding="0" cellspacing="0" border="1" width="100%"><tr valign="top">
+<td id="sidebar" width="30">
+<p>&nbsp;</p>
+<span style="font-size: .75em;" style="font-family: helvetica, sans-serif;" id="buttonArea">
+<div id='layer1' style='z-index: 10, background: #ffa;'>
+  <input type="button" name="groovybtn1" id="loadButton" class="groovybutton" title="" value="Load" onClick="loadData()" />
+</div>
+</span>
+<ul class="sub">
+    <li><a class="loadexternalsubexperiment" href="bilingualaphasiatest/en06_Verbal_Auditory_Discrimination.json">LoadExternalData</a></li>
+    <!--<li><a class="loadjson" href="moo-images.json">JSON-Icons</a></li>-->
+    <!-- <li><a class="loadremote" href="ajax-page.html" rel=".icons" >Remote Images form a HTML-Page with Filter</a></li>-->
+  </ul>
+
+</td>
+<td>
+<!-- <canvas id="homeCanvas"> </canvas>-->
+<canvas id="viewStimulus" style="z-index: -1, background: #999, top: 60;"  width="1280" height="800">
+</canvas>
+</td>
+</tr></table>
+
+</body>
+
+</html>
