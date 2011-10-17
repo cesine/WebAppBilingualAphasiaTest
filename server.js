@@ -149,6 +149,17 @@ http.createServer(function(req, res) {
     });
     form.parse(req);
   }
+	// respond to status queries
+  regex = new RegExp('/extract/(.+)');
+  match = regex.exec(req.url);
+  if (match) {
+    uuid = match[1];
+    uuid = uuid.replace(/.mp3/,"");
+		res.writeHead(200, {'content-type': 'application/json'});
+    res.write("Extracting textgrids using Praat. This may take a while....");
+    res.end();
+
+	}
   // respond to status queries
   regex = new RegExp('/status/(.+)');
   match = regex.exec(req.url);

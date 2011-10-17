@@ -1,6 +1,6 @@
 #!/bin/bash
 cd ../oprime-server
-mv ../oprime-transcription-heavy src
+mv ../oprime-transcription-lite src
 #mkdir practicetemp
 #cd practicetemp
 
