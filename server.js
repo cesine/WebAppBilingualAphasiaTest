@@ -76,7 +76,7 @@ http.createServer(function(req, res) {
         res.write("Server is Processing.\n");
         res.write(filename + ':filename\n' + path + ':path\n');
         //TODO run versioning on all uploaded files
-				exec("sh audio2text.sh "+ safeFilename.replace(/_client\.srt/,""),puts);
+				exec("sh audio2text.sh "+ safeFilename.replace(/\.3gp/,""),puts);
       }else{
 				res.write("File uploaded.");
 			}
