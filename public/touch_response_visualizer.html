@@ -127,6 +127,23 @@ input.groovybutton
 	var viewstimulus;
 	var ctx;
 
+  /*
+    Code to detect long clicks on nodes. 
+    Generally if longclick >500 its a long click
+  */
+  var downclick;
+  var upclick;
+  var longclick;
+  var longClickDrawStimuli = function(){
+    var d = new Date();
+    upclick = d.getTime();
+    longclick=upclick-downclick;
+    if (longclick > 500){
+
+    }
+  }
+
+
 	var pause = false;
 	var timer;
 	var stopLooping = function() {
