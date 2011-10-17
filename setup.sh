@@ -12,6 +12,8 @@ mkdir logs
 
 # set up git in the backup folder
 cd backup
+cp ../src/srt2touchdatadir.sh srt2touchdatadir.sh
+cp ../src/srt2touchdatafile.sh srt2touchdatafile.sh
 git init
 git config user.name "OPrime Laptop Server Instance"
 git config user.email "oprimeinstance@laptop"

@@ -76,7 +76,7 @@ http.createServer(function(req, res) {
         res.write("Server is Processing.\n");
         res.write(filename + ':filename\n' + path + ':path\n');
         //TODO run versioning on all uploaded files
-				exec("sh audio2text.sh "+ safeFilename.replace(/\.3gp/,""),puts);
+				exec("bash audio2text.sh "+ safeFilename.replace(/\.3gp/,""),puts);
       }else{
 				res.write("File uploaded.");
 			}
@@ -106,9 +106,20 @@ http.createServer(function(req, res) {
   if (match) {
     uuid = match[1];
     uuid = uuid.replace(/.mp3/,"");
-		res.writeHead(200, {'content-type': 'application/json'});
-    res.write("Extracting textgrids using Praat. This may take a while....");
-    res.end();
+		res.writeHead(200, {'content-type': 'text/html'});
+		res.write("<html>");
+
+		regex = new RegExp('/extract/touch');
+	  match = regex.exec(req.url);
+		if(match){	
+	    res.write("Extracting touch results from the subtitles....<p>&nbsp</p>The data is now integrated in the <a href='/touch_response_visualizer.html'>touch response visualizer</a>");
+			exec("bash ../backup/srt2touchdatadir.sh ",puts);
+  	}else{
+			res.write("Extracting textgrids using Praat. This may take a while....");
+			exec("bash praatfiles/audio2textGrid.sh ",puts);
+		}
+		res.write("<p>The raw results are in the <a href='file:///Applications/OPrimeAdministrator.app/Contents/Resources/oprime-server/results'>/Applications/OPrimeAdministrator.app/Contents/Resources/oprime-server/results</a> ");
+	  res.end();
 
 	}
   // respond to status queries

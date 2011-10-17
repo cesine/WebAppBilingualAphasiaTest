@@ -22,7 +22,8 @@ echo "----- Extracting data into csv ------"
 jsonfile="touch-responses.json"
 echo '{"responses":[{"id":0,"x":0,"y":0,"userid":"0000","reactionTime":0,"subexperiment":"00","stimulus":0,"color":"#000000","r":3}' >> $jsonfile
 
-for i in $@
+FILES=../backup/*.srt
+for i in $FILES
 do
   file=$i
   #1318026828633_ET1AM8RB_en28_Reading_Comprehension_for_Words.srt
@@ -39,7 +40,9 @@ do
   #Starttime 1318026828633, participant ET1AM8RB, experimentcode en28, experimenttitle Reading_Comprehension_for_Words
   unset IFS
   grep "ParticipantID" $file >tempheader
-  HEADER=`cat tempheader`
+  #grep "ParticipantID" $file 
+	#cat $file
+	HEADER=`cat tempheader`
   grep "ReactionTimes" $file >tempreactions
   grep "TouchResponses" $file >temptouches
 
@@ -77,13 +80,13 @@ do
   echo $participantcode,$starttime,x${xs// /} >>$csvfile
   echo $participantcode,$starttime,y$ys >> $csvfile
 
-  rm tempheader
-  rm tempreactions
-  rm temptouches
+  #rm tempheader
+  #rm tempreactions
+  #rm temptouches
 done
 
 echo "]}" >> $jsonfile
-
+cp $jsonfile ../src/public/bilingualaphasiatest/touch-responses.json
 
 echo "==============================================================="
 
