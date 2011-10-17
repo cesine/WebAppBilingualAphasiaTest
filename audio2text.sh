@@ -9,7 +9,7 @@ echo ==Moving to backup folder
 cd ../backup
 
 echo ==Creating files _client, _server and .srt
-cp ../results/$1.3gp $1.3gp
+#cp ../results/$1.3gp $1.3gp
 
 echo ==Branching to user branch
 ../src/dependancies/git checkout tabletclient
@@ -42,6 +42,8 @@ echo "==Processing prosody with Praat"
 echo "==Commiting new acoustic results"
 ../src/dependancies/git add praatresults.csv *.TextGrid
 ../src/dependancies/git commit -m "ran praat on $1"
+
+cp $1.* ../results/
 
 echo "==Server transcription is ready."
 #git checkout master #leave it in the MachineTranascription branch so that the node will copy the right version of the file into the server's response.
