@@ -80,9 +80,9 @@ do
   echo $participantcode,$starttime,x${xs// /} >>$csvfile
   echo $participantcode,$starttime,y$ys >> $csvfile
 
-  #rm tempheader
-  #rm tempreactions
-  #rm temptouches
+  rm tempheader
+  rm tempreactions
+  rm temptouches
 done
 
 echo "]}" >> $jsonfile
