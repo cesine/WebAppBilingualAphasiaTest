@@ -1,5 +1,7 @@
 
-This is code which was used for extacting and analyzing the Bilingual Aphasia Test Android app (Cook, Marquis, Achim 2011 presented at The Academy of Aphasia 2011 - Montreal)). To know more about the archetecture and what Open Source projects were incorporated into this you can look at the Experimenter WebApp in this pdf: http://ilanguagelab.googlecode.com/files/cook%2Cmarquis%2Cachim-2011-Aphasia_assesment_on_Android_recording_voice_eye_gaze_and_touch_for_the_BAT_compressed.pdf
+This is code which was used for extacting and analyzing data from the Bilingual Aphasia Test Android app (Cook, Marquis, Achim 2011 presented at The Academy of Aphasia 2011 - Montreal)). To know more about the archetecture and what Open Source projects were incorporated into this you can look at the Experimenter WebApp in this pdf: 
+
+https://github.com/iLanguage/OPrimeAdministrator/blob/master/cook,marquis,achim-2011-aphasia_assessment_on_android_architecture_and_sample_results.pdf?raw=true
 
 You can think of this as the Experimentor's tool. The tablet can connect to your laptop, send the files to your laptop. The tool has two functions
 
@@ -7,7 +9,7 @@ You can think of this as the Experimentor's tool. The tablet can connect to your
 2. Analyze/visualize the data
 
 
-There is a "WATCHME" you TubeVideo to show what this project does. http://www.youtube.com/watch?v=8SNhUbzkk4k The code is also running with our data on the web. You can play with it here http://openlanguage.ca:8136/touch_response_visualizer.html
+There are some "WATCHME" YouTube Videos http://www.youtube.com/playlist?list=PLF468B25FFEF8EAF9 to show what this project is and how it relates to the AndroidBilingualAphasiaTest project.  The code is also running with our data on the web. You can play with it here http://openlanguage.ca:8136/touch_response_visualizer.html
 
 
 
@@ -17,7 +19,10 @@ The audience of this project:
 * researchers who program, or have a programmer in their team who can adapt the code to their needs
 
 
-There is a "moderatly user friendly" Installer for Mac OS Snow Leopard or Lion which can be used to visualize the sample data and see what this code does. User be-warned: its a very young project, so like a baby it often bables, burps and sometimes spits up unexpectedly. Its heavy 200MB but it sets up your laptop to do some significant data crunching. Email me and I can send you a link. 
+
+There is a "moderatly user friendly" Installer for Mac OS Snow Leopard or Lion which can be used to visualize the sample data and see what this code does. User be-warned: its a very young project, so like a baby it often bables, burps and sometimes spits up unexpectedly. Its heavy 200MB but it sets up your laptop to do some significant data crunching. http://code.google.com/p/ilanguagelab/downloads/detail?name=OPrimeAdministratorInstaller_va3.zip&can=2&q= 
+
+
 
 The next steps:
 
