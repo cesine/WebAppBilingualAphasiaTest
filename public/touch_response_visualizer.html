@@ -694,7 +694,11 @@ input.groovybutton
 						responses[k].color = "#999999";
 						responses[k].r = buttonRadiusForClicking;
 						responses[k].draw()
+						ctx.fillStyle = "white";
 						ctx.textAlign = responses[k].textAlign;
+						console.log("drawing backgorund rect");
+						//ctx.fillRect(responses[k].labelx, responses[k].labely-2, responses[k].labelx+10, responses[k].labely+2)
+						ctx.fillStyle = "#333333";
 						ctx.fillText(responses[k].label, responses[k].labelx,
 								responses[k].labely);
 						//alert("Clicked "+responses[k].id);
@@ -729,7 +733,18 @@ input.groovybutton
 					responses[k].label=responses[k].encodedResponse+" :  "+responses[k].userid+" @ "+responses[k].reactionTime/1000+"sec";
 					responses[k].labelx=responses[k].x+10;
 					responses[k].labely=responses[k].y+10;
-					ctx.textAlign = "left";
+					
+					ctx.fillStyle = "white";
+          var bottomx = x+1;
+					var bottomy = y;
+					var topx = responses[k].labelx+10;
+					var topy = responses[k].labely-20;
+					ctx.fillRect(topx, topy, 250, 30);
+          console.log("drawing backgroud rect" + topx + ", " + topy + ", " +bottomx+", "+bottomy);
+
+					ctx.fillStyle = responses[k].color;
+
+						ctx.textAlign = "left";
 					ctx.fillText(responses[k].label, responses[k].labelx,
 							responses[k].labely);
 					//alert("Participant "+responses[k].userid);
