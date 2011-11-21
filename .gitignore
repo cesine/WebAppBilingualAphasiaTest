@@ -1,3 +1,7 @@
 .svn
+
+#ignore the pdfs, the directory is to heavy
+bilingual_aphasia_test_pdfs
+
 /hack
 /txt
