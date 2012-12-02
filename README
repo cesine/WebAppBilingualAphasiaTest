@@ -1,30 +1,14 @@
+This is code which was used for extacting and analyzing data in 2011 for the Bilingual Aphasia Test Android app (Cook, Marquis, Achim 2011) presented at The Academy of Aphasia 2011 - Montreal. To know more about the archetecture and what Open Source projects were incorporated into this you can look at the Experimenter WebApp Diagram in this pdf: 
 
-This is code which was used for extacting and analyzing data from the Bilingual Aphasia Test Android app (Cook, Marquis, Achim 2011 presented at The Academy of Aphasia 2011 - Montreal)). To know more about the archetecture and what Open Source projects were incorporated into this you can look at the Experimenter WebApp in this pdf: 
+https://github.com/iLanguage/AndroidBilingualAphasiaTest/blob/master/cook,marquis,achim-2011-aphasia_assessment_on_android_architecture_and_sample_results.pdf?raw=true
 
-https://github.com/iLanguage/OPrimeAdministrator/blob/master/cook,marquis,achim-2011-aphasia_assessment_on_android_architecture_and_sample_results.pdf?raw=true
-
-You can think of this as the Experimentor's tool. The tablet can connect to your laptop, send the files to your laptop. The tool has two functions
-
-1. Extract the raw data
-2. Analyze/visualize the data
+For the updated code which we have continued to build and improve, see the https://github.com/iLanguage/OPrime project. This code is no longer maintained. 
 
 
 There are some "WATCHME" YouTube Videos http://www.youtube.com/playlist?list=PLF468B25FFEF8EAF9 to show what this project is and how it relates to the AndroidBilingualAphasiaTest project.  The code is also running with our data on the web. You can play with it here http://openlanguage.ca:8136/touch_response_visualizer.html
 
 
+There was a "moderatly user friendly" Installer for Mac OS Snow Leopard which can be used to visualize the sample data and see what this code does. User be-warned: its a very young project, so like a baby it often bables, burps and sometimes spits up unexpectedly. Its very heavy 200MB but it sets up your laptop to do some significant data crunching. http://code.google.com/p/ilanguagelab/downloads/detail?name=OPrimeAdministratorInstaller_va3.zip&can=2&q= 
 
-The audience of this project:
-
-* open source programmers
-* researchers who program, or have a programmer in their team who can adapt the code to their needs
-
-
-
-There is a "moderatly user friendly" Installer for Mac OS Snow Leopard or Lion which can be used to visualize the sample data and see what this code does. User be-warned: its a very young project, so like a baby it often bables, burps and sometimes spits up unexpectedly. Its heavy 200MB but it sets up your laptop to do some significant data crunching. http://code.google.com/p/ilanguagelab/downloads/detail?name=OPrimeAdministratorInstaller_va3.zip&can=2&q= 
-
-
-
-The next steps:
-
-To encourage us  you can "watch" our project, "fork" the code, and even send us "pull requests" if you want to contribute your modifications.
+The Installer is unnecesary if you are familiar with the Terminal/Commandline. All the dependancies run on either Linux or Mac. Contact us if you would like some help setting it up: https://docs.google.com/spreadsheet/viewform?formkey=dGpiRDhreGpmTFBmQ2FUTVVjVlhESHc6MQ
 
